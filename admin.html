@@ -185,7 +185,7 @@ var SB='https://onpyyvgihaoczaxkhkfb.supabase.co',KEY='sb_publishable_Y1eXX2KgoC
 var CATS={restauration:'Restauration',redorure:'Redorure',linogravure:'Linogravure',gravure:'Gravure'};
 var AVCATS={restauration:'Restauration',redorure:'Redorure',gravure:'Gravure'};
 var NEEDS={restauration:'Restauration',redorure:'Redorure',linogravure:'Linogravure',gravure:'Gravure / lettrage',plaque:'Plaque funéraire',portrait:'Portrait sur granit',entretien:'Entretien de sépulture'};
-var INFO_DEF={annonceOn:false,annonce:'L’atelier sera fermé du 23 décembre au 2 janvier. Bonnes fêtes !',tel:'06 00 00 00 00',email:'contact@gravure-lafargue.fr',zone:'[Commune du siège] et alentours, dans tous les cimetières',dispo:'Du lundi au vendredi, 8h – 18h'};
+var INFO_DEF={annonceOn:false,annonce:'L’atelier sera fermé du 23 décembre au 2 janvier. Bonnes fêtes !',tel:'06 00 00 00 00',email:'contact@gravurelafargue.fr',zone:'[Commune du siège] et alentours, dans tous les cimetières',dispo:'Du lundi au vendredi, 8h – 18h'};
 var GAL_DEF=[
  {id:'g1',img:'builtin:res',titre:'Ajout d’un nom sur une plaque existante',cat:'gravure'},
  {id:'g2',img:'builtin:e8',titre:'Pose de la feuille d’or',cat:'redorure'},
@@ -335,7 +335,7 @@ function render(){
   if(A.tab==='mdp')h+=vMdp();
   app.innerHTML=h+'</main>';
   if(A.tab==='stats')drawMap(D);
-  if(A.tab==='infos'&&A.notif==null)LFG.rpc('lfg_prive_lire',{p_token:LFG.token()}).then(function(p){A.notif=(p&&p.notif_email)||'';var n=$('n-mail');if(n){n.value=A.notif;n.placeholder='Ex. : contact@gravure-lafargue.fr'}}).catch(function(){});
+  if(A.tab==='infos'&&A.notif==null)LFG.rpc('lfg_prive_lire',{p_token:LFG.token()}).then(function(p){A.notif=(p&&p.notif_email)||'';var n=$('n-mail');if(n){n.value=A.notif;n.placeholder='Ex. : contact@gravurelafargue.fr'}}).catch(function(){});
 }
 
 /* ---------- Demandes ---------- */
@@ -673,7 +673,7 @@ function vInfos(){
   '<div class="field" style="margin:0"><label for="i-fb">Page Facebook <small>(facultatif)</small></label><input type="text" id="i-fb" inputmode="url" value="'+esc(I.facebook||'')+'" placeholder="Ex. : facebook.com/gravurelafargue"><small>Collez le lien de la page : le bouton Facebook apparaît sur le site. Laissez vide pour le cacher.</small></div></div>'+
   '<button class="btn btn-gold" style="width:100%" data-a="saveinfo">Enregistrer</button>'+
   '<div class="card" style="margin-top:26px" id="notifCard"><h3>Être prévenu par e-mail</h3><p class="hint" style="margin:-4px 0 12px">À chaque nouvelle demande de devis, un e-mail est envoyé à cette adresse (plusieurs adresses possibles, séparées par une virgule). Cette adresse n’apparaît pas sur le site.</p>'+
-  '<div class="field"><label for="n-mail">Adresse e-mail</label><input type="email" id="n-mail" value="'+esc(A.notif==null?'':A.notif)+'" placeholder="'+(A.notif==null?'Chargement…':'Ex. : contact@gravure-lafargue.fr')+'"></div>'+
+  '<div class="field"><label for="n-mail">Adresse e-mail</label><input type="email" id="n-mail" value="'+esc(A.notif==null?'':A.notif)+'" placeholder="'+(A.notif==null?'Chargement…':'Ex. : contact@gravurelafargue.fr')+'"></div>'+
   '<button class="btn btn-line" style="width:100%" data-a="savenotif">Enregistrer l’adresse</button></div>';
 }
 
