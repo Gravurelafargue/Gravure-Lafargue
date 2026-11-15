@@ -105,7 +105,12 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold);background:#fff
 @media(max-width:560px){.topbar .links .btn{padding:0 11px}.tabs button{font-size:13.5px;padding:12px 2px}}
 .tabs{overflow-x:auto;scrollbar-width:none;justify-content:flex-start}.tabs::-webkit-scrollbar{display:none}
 .tabs button{flex:0 0 auto;padding:12px 12px;white-space:nowrap}
-@media(min-width:900px){.tabs button{flex:1}}
+@media(min-width:900px){.tabs{max-width:1180px;justify-content:safe center}.tabs button{padding:12px 13px}}
+.tabw{position:relative;max-width:1180px;margin:0 auto}
+.tarr{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:var(--gold);color:#fff;font:400 24px/1 Georgia,serif;padding:0 0 3px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 7px #fff,0 4px 12px -4px rgba(0,0,0,.35)}
+.tarr.l{left:4px}.tarr.r{right:4px}
+.tabw.cl .tarr.l,.tabw.cr .tarr.r{display:flex}
+.tabw.cl .tabs{padding-left:44px}.tabw.cr .tabs{padding-right:44px}
 .dem.pro-c{border-left-color:#2E5E8C}
 .pro{background:#2E5E8C}
 .part{display:inline-block;margin-top:4px;background:#F3EDE2;color:var(--gold-d);font-size:12px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:999px}
@@ -330,7 +335,7 @@ function render(){
   var T=[['demandes','Demandes'+(nb?' <span class="badge">'+nb+'</span>':'')],['stats','Statistiques'],['avap','Avant/après'],['galerie','Galerie'],['spe','Spécialités'],['methode','Notre méthode'],['plaques','Plaques'],['perso','Personnalisation'],['legal','CGV / CGU'],['infos','Infos'],['mdp','Mot de passe']];
   var h='<div class="top"><div class="topbar"><img src="'+LOGO+'" alt="Gravure Lafargue"><div class="links">'+
     '<button class="btn btn-line btn-sm" data-a="tuto" id="tutoBtn" aria-label="Tutoriel">🎓 <span>Tutoriel</span></button><a class="btn btn-line btn-sm" id="siteBtn" href="index.html" target="_blank"><span>Voir le site</span></a><button class="btn btn-line btn-sm" data-a="logout"><span>Quitter</span></button></div></div>'+
-    '<nav class="tabs">'+T.map(function(t){return '<button data-tab="'+t[0]+'" class="'+(A.tab===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</nav></div><main>';
+    '<div class="tabw"><button type="button" class="tarr l" data-ts="-1" aria-label="Onglets précédents">‹</button><nav class="tabs">'+T.map(function(t){return '<button data-tab="'+t[0]+'" class="'+(A.tab===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</nav><button type="button" class="tarr r" data-ts="1" aria-label="Onglets suivants">›</button></div></div><main>';
   if(A.tab==='demandes')h+=vDemandes(D);
   if(A.tab==='stats')h+=vStats(D);
   if(A.tab==='avap')h+=vAvap();
@@ -343,6 +348,11 @@ function render(){
   if(A.tab==='infos')h+=vInfos();
   if(A.tab==='mdp')h+=vMdp();
   app.innerHTML=h+'</main>';
+  var tOn=app.querySelector('.tabs .on'),tb=app.querySelector('.tabs');
+  if(tb){var tw=tb.parentNode,upd=function(){var m=tb.scrollWidth-tb.clientWidth;tw.classList.toggle('cl',tb.scrollLeft>4);tw.classList.toggle('cr',tb.scrollLeft<m-4)};
+    if(tOn&&tb.scrollWidth>tb.clientWidth)tb.scrollLeft=tOn.offsetLeft-(tb.clientWidth-tOn.offsetWidth)/2;
+    tb.addEventListener('scroll',upd,{passive:true});tw.querySelectorAll('.tarr').forEach(function(b){b.onclick=function(){tb.scrollBy({left:+b.dataset.ts*tb.clientWidth*.7,behavior:'smooth'})}});upd();
+    if(!window.__tabRs){window.__tabRs=1;window.addEventListener('resize',function(){var t=document.querySelector('.tabs');if(t)t.dispatchEvent(new Event('scroll'))})}}
   if(A.tab==='stats')drawMap(D);
   if(A.tab==='infos'&&A.notif==null)LFG.rpc('lfg_prive_lire',{p_token:LFG.token()}).then(function(p){A.notif=(p&&p.notif_email)||'';var n=$('n-mail');if(n){n.value=A.notif;n.placeholder='Ex. : contact@gravurelafargue.fr'}}).catch(function(){});
 }
