@@ -240,7 +240,14 @@ function loadThumbs(){var ids=refs();if(!ids.length)return Promise.resolve();
 var ready=get('lfg_contenu?select=cle,valeur').then(function(L){L.forEach(function(x){C[x.cle]=x.valeur});return loadThumbs()}).catch(function(e){console.warn('LFG',e)});
 function rz(file,max,q){return new Promise(function(ok,ko){var r=new FileReader();r.onerror=ko;r.onload=function(){var im=new Image();im.onerror=ko;im.onload=function(){var s=Math.min(1,max/Math.max(im.width,im.height));var c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',q))};im.src=r.result};r.readAsDataURL(file)})}
 function save(k,v){C[k]=clone(v);return rpc('lfg_enregistrer',{p_token:token,p_cle:k,p_valeur:v})}
+function backup(devis){
+  return Promise.all([get('lfg_contenu?select=cle,valeur,maj'),get('lfg_images?select=id,thumb,full_img,cree')]).then(function(r){
+    var vids=[];(C.outils||[]).forEach(function(o){if(o.video)vids.push({outil:o.nom,video:o.video,lien:o.video.indexOf('http')===0?o.video:SB+'/storage/v1/object/public/lfg-videos/'+o.video})});
+    return {site:'gravurelafargue.fr',type:'sauvegarde-complete',version:1,date:new Date().toISOString(),contenu:r[0],images:r[1],demandes:devis||[],videos:vids};
+  });
+}
 return {
+ backup:backup,
  CATS:CATS,AVCATS:AVCATS,NEEDS:NEEDS,ready:ready,rpc:rpc,
  info:function(){var d=clone(INFO_DEF),i=C.info||{};for(var k in i)d[k]=i[k];return d},
  galerie:function(){return val('galerie',GAL_DEF)},
@@ -676,7 +683,9 @@ function vInfos(){
   '<button class="btn btn-gold" style="width:100%" data-a="saveinfo">Enregistrer</button>'+
   '<div class="card" style="margin-top:26px" id="notifCard"><h3>Être prévenu par e-mail</h3><p class="hint" style="margin:-4px 0 12px">À chaque nouvelle demande de devis, un e-mail est envoyé à cette adresse (plusieurs adresses possibles, séparées par une virgule). Cette adresse n’apparaît pas sur le site.</p>'+
   '<div class="field"><label for="n-mail">Adresse e-mail</label><input type="email" id="n-mail" value="'+esc(A.notif==null?'':A.notif)+'" placeholder="'+(A.notif==null?'Chargement…':'Ex. : contact@gravurelafargue.fr')+'"></div>'+
-  '<button class="btn btn-line" style="width:100%" data-a="savenotif">Enregistrer l’adresse</button></div>';
+  '<button class="btn btn-line" style="width:100%" data-a="savenotif">Enregistrer l’adresse</button></div>'+
+  '<div class="card" style="margin-top:26px"><h3>💾 Sauvegarde</h3><p class="hint" style="margin:-4px 0 12px">Télécharge un fichier avec tous les textes, toutes les photos et toutes les demandes de devis. Gardez-le sur votre ordinateur ou une clé USB : il permet de tout remettre en place en cas de problème. Conseillé une fois par mois.</p>'+
+  '<button class="btn btn-gold" style="width:100%" data-a="backup">Télécharger une sauvegarde</button></div>';
 }
 
 function vMdp(){
@@ -806,6 +815,8 @@ document.addEventListener('click',function(e){
   case 'editpl':editPl(+t.dataset.i);break;
   case 'delpl':if(confirm('Retirer cette plaque du site ?')){G=LFG.plaques();G.splice(+t.dataset.i,1);sv(LFG.savePlaques(G),'Plaque retirée')}break;
   case 'uppl':G=LFG.plaques();sv(LFG.savePlaques(mv(G,+t.dataset.i)));break;
+  case 'backup':t.disabled=true;var bt=t.textContent;t.textContent='Préparation…';
+    LFG.backup(A.D).then(function(o){var b=new Blob([JSON.stringify(o)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='sauvegarde-gravure-lafargue-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},2000);toast('Sauvegarde téléchargée ✓')}).catch(oops).then(function(){t.disabled=false;t.textContent=bt});break;
   case 'saveinfo':
     var I={annonceOn:$('i-on').checked,annonce:$('i-ann').value.trim(),tel:$('i-tel').value.trim(),dispo:$('i-dispo').value.trim(),email:$('i-mail').value.trim(),zone:$('i-zone').value.trim(),facebook:$('i-fb').value.trim()};
     if(I.facebook&&!/facebook\.com|fb\.com|fb\.me/i.test(I.facebook)){toast('Le lien doit être une adresse Facebook');break}
